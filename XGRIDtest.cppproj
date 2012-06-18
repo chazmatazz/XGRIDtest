@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>5.1</ProjectVersion>
+    <ToolchainName>com.Atmel.AVRGCC8</ToolchainName>
+    <ProjectGuid>{d7eb1ff3-7416-4d40-af77-cf126a90d31f}</ProjectGuid>
+    <avrdevice>ATxmega128A3</avrdevice>
+    <avrdeviceseries>none</avrdeviceseries>
+    <OutputType>Executable</OutputType>
+    <Language>CPP</Language>
+    <OutputFileName>$(MSBuildProjectName)</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
+    <AssemblyName>XGRIDtest</AssemblyName>
+    <Name>XGRIDtest</Name>
+    <RootNamespace>XGRIDtest</RootNamespace>
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <AsfVersion>2.11.1</AsfVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <ToolchainSettings>
+      <AvrGcc>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.optimization.DebugLevel>None</avrgcc.compiler.optimization.DebugLevel>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
+        <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
+        <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcccpp.compiler.optimization.DebugLevel>None</avrgcccpp.compiler.optimization.DebugLevel>
+        <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
+        <avrgcccpp.linker.libraries.Libraries>
+          <ListValues>
+            <Value>m</Value>
+          </ListValues>
+        </avrgcccpp.linker.libraries.Libraries>
+      </AvrGcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ToolchainSettings>
+      <AvrGcc>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcccpp.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
+        <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcccpp.compiler.optimization.level>Optimize (-O1)</avrgcccpp.compiler.optimization.level>
+        <avrgcccpp.compiler.optimization.DebugLevel>Default (-g2)</avrgcccpp.compiler.optimization.DebugLevel>
+        <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
+        <avrgcccpp.linker.libraries.Libraries>
+          <ListValues>
+            <Value>m</Value>
+          </ListValues>
+        </avrgcccpp.linker.libraries.Libraries>
+        <avrgcccpp.assembler.debugging.DebugLevel>Default (-g2)</avrgcccpp.assembler.debugging.DebugLevel>
+      </AvrGcc>
+    </ToolchainSettings>
+    <UsesExternalMakeFile>True</UsesExternalMakeFile>
+    <OutputDirectory>C:\Documents and Settings\common\My Documents\AVRStudio\XGRIDtest\XGRIDtest\xmega</OutputDirectory>
+    <ExternalMakeFilePath>C:\Documents and Settings\common\My Documents\AVRStudio\XGRIDtest\XGRIDtest\xmega\Makefile</ExternalMakeFilePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="xboot" />
+    <Folder Include="xmega" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="xboot\api.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\api.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\eeprom_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\eeprom_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\fifo.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\fifo.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\flash.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\flash.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\i2c.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\i2c.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\protocol.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\sp_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\sp_driver.S">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\uart.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\uart.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\watchdog.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\watchdog.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\xboot.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\xboot.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\xbootapi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xboot\xbootapi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\avr_compiler.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\board.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\eeprom.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\eeprom.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\i2c.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\i2c.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\iostream.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\iostream.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\istream.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\istream.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\main.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\main.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\ostream.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\ostream.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\servo.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\servo.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\spi.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\usart.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\usart.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\xgrid.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="xmega\xgrid.h">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="xboot\mkpackage.sh">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="xboot\README.md">
+      <SubType>compile</SubType>
+    </None>
+  </ItemGroup>
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
+</Project>
