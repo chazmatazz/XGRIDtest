@@ -19,6 +19,9 @@ extern int16_t smart_servo_pos_deg;
 
 void init_servo(void);
 
+void disable_servo(void);
+void enable_servo(void);
+
 //uint16_t servo_CNT_compare_from_postion(int16_t degrees);
 uint16_t servo_CNT_compare_from_postion(float degrees);
 //void set_servo_position(int16_t degrees);

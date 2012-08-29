@@ -57,6 +57,25 @@ void init_servo()
 	}	
 }	
 
+void disable_servo()
+{
+	if(SERVO_MODE == QUICK_SERVO)
+	{
+		TCE1.CTRLB &= ~0b00010000;		// disable waveform output on OC1A (setting this in WGM of operation overrides the port output register for this output pin: portEpin4)
+		TCE1.CTRLB &= ~0b00100000;		// disable waveform output on OC1B (setting this in WGM of operation overrides the port output register for this output pin: portEpin5)
+	}
+}
+
+void enable_servo()
+{
+	if(SERVO_MODE == QUICK_SERVO)
+	{
+		TCE1.CTRLB |= 0b00010000;		// enable waveform output on OC1A (setting this in WGM of operation overrides the port output register for this output pin: portEpin4)
+		TCE1.CTRLB |= 0b00100000;		// enable waveform output on OC1B (setting this in WGM of operation overrides the port output register for this output pin: portEpin5)
+	}
+}
+
+
 uint16_t servo_CNT_compare_from_postion(float degrees)
 {
 	uint16_t compare_value;		// this value will ultimately fill the PER register of the timer/counter
@@ -78,7 +97,7 @@ void set_servo_position(float degrees)
 			uint16_t compare_value = servo_CNT_compare_from_postion(degrees);		
 
 			TCE1.CCABUF = compare_value;	// fill the clock-compare A-buffer with the servo position val (for pin OC1A)
-											// CCABUF will be loaded into CCB on the next UPDATE event (counter value = BOTTOM)
+											// CCABUF will be loaded into CCA on the next UPDATE event (counter value = BOTTOM)
 	
 			TCE1.CCBBUF = compare_value;	// fill the clock-compare B-buffer with the servo position val (for pin OC1B)
 											// CCBBUF will be loaded into CCB on the next UPDATE event (counter value = BOTTOM)								

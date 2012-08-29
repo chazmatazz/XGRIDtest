@@ -309,21 +309,18 @@ ifeq ($(OVERRIDE_AVRDUDE_PROGRAMMER),)
 # Type: avrdude -c ?
 # to get a full listing.
 #
-AVRDUDE_PROGRAMMER = jtag2pdi
+#AVRDUDE_PROGRAMMER = jtag2pdi
 #AVRDUDE_PROGRAMMER = jtag2isp
 #AVRDUDE_PROGRAMMER = avrispmkii
-#AVRDUDE_PROGRAMMER = avr109
-# note: avr109 is serial cable
-
+AVRDUDE_PROGRAMMER = avr109
 
 # Port
 # com1 = serial port. Use lpt1 to connect to parallel port.
 # Use usb for usb devices
 # For *nix, need device path (/dev/ttyUSBn, /dev/ttySn)
-AVRDUDE_PORT = usb
+#AVRDUDE_PORT = usb
 #AVRDUDE_PORT = /dev/ttyUSB0
-#AVRDUDE_PORT = COM11
-#AVRDUDE_PORT = COM13
+AVRDUDE_PORT = COM3
 
 # BAUD Rate
 AVRDUDE_BAUD = 115200

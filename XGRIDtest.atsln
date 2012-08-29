@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "XGRIDtest", "XGRIDtest.cppproj", "{D7EB1FF3-7416-4D40-AF77-CF126A90D31F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D7EB1FF3-7416-4D40-AF77-CF126A90D31F}.Debug|AVR.ActiveCfg = Debug|AVR
+		{D7EB1FF3-7416-4D40-AF77-CF126A90D31F}.Debug|AVR.Build.0 = Debug|AVR
+		{D7EB1FF3-7416-4D40-AF77-CF126A90D31F}.Release|AVR.ActiveCfg = Release|AVR
+		{D7EB1FF3-7416-4D40-AF77-CF126A90D31F}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

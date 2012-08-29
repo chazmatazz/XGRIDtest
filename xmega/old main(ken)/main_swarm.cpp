@@ -33,6 +33,7 @@
 
 
 #include "main.h"
+#include "stdlib.h"
 
 // USART
 
@@ -83,7 +84,7 @@ volatile unsigned long jiffies = 0;
 void swarm_initialization();
 void swarm_communication();
 void swarm_calculation();
-void swarm_interaction(int i, int j, int nei);
+void swarm_interaction(int);
 void servo_motor_control();
 
 // END KENS CODE	============================================================================================
@@ -113,14 +114,11 @@ ISR(TCC0_OVF_vect)
 {
         // Timers
         jiffies++;
-
+        
         if (jiffies % 20 == 0)
 		{
-			//LED_PORT.OUTTGL = LED_USR_0_PIN_bm;		// toggle red light every 50 ms (20 Hz)
-			//servo_motor_control();
-			//swarm_calculation();
+			LED_PORT.OUTTGL = LED_USR_0_PIN_bm;		// toggle red light every 50 ms (20 Hz)
 			servo_motor_control();
-			//swarm_communication();
 		}		
 		
 		if (jiffies % 50 == 0)
@@ -128,12 +126,6 @@ ISR(TCC0_OVF_vect)
 			swarm_communication();
 			swarm_calculation();
 		}		
-       
-		if (jiffies % 200 == 0)
-		{
-			//swarm_communication();
-		}
-	   
 	   
 	    xgrid.process();
 }
@@ -264,8 +256,8 @@ float ld = 20.0;		// virtual distance between the nodes
 float dt = 0.05;		// time step for difference equation
 float acc = 20.0;		// self-propelling force
 float gmma =5.0;		// viscosity
-float ka = 1.0;			// spring constant
-float d = 0.0;			// strength of anisotropy
+float ka = 0.1;			// spring constant
+float d = 0.5;			// strength of anisotropy
 float cf = 100.0;		// strength of interaction with neighbors
 float rc = 20.0;		// optimum distance between agents
 float tau = 1.0;		// relaxation time of heading dynamics
@@ -276,7 +268,7 @@ int i, j, t;	// moved from swarm_initialization() to global
 
 #define PI 3.14159
 #define RADtoDEG 57.29578
-#define delayX 1
+#define delayX 10
 #define SIZEX 10
 #define SIZEY 10
 #define NUM_NEIGHBORS 6
@@ -290,11 +282,9 @@ struct OBJ{
 	// dt delta time
 	// vpx, vpy velocity of point
 	float px, py, vx, vy, hd, dt, vpx, vpy;
-	// ?
-	float mempx[delayX], mempy[delayX];
 	// neighbors
 	float neix[NUM_NEIGHBORS], neiy[NUM_NEIGHBORS];
-	int mempt;
+	int open[NUM_NEIGHBORS];//###########################################################################################
 } mchip;
 
 
@@ -309,15 +299,17 @@ point mdata;
 /*
  * Receive KEN's data
  */
+//###########################################################################################
 void rx_pkt(Xgrid::Packet *pkt)
 {
+		mchip.open[pkt->rx_node] = 1;
 		point* pt_ptr = (point*) pkt->data;
-		mchip.neix[pkt->source_id] = pt_ptr->x;
-		mchip.neiy[pkt->source_id] = pt_ptr->y;
+		mchip.neix[pkt->rx_node] = pt_ptr->x;
+		mchip.neiy[pkt->rx_node] = pt_ptr->y;
         LED_PORT.OUTTGL = LED_USR_2_PIN_bm;		// toggle green light when receive packet?
-
-fprintf_P(&usart_stream, PSTR("x: %i.%i, y: %i.%i\r\n"), prt_flt3(pt_ptr->x), prt_flt3(pt_ptr->y));
+		//fprintf_P(&usart_stream, PSTR("%d\r\n"), pkt->rx_node); //check received port
 }
+//###########################################################################################
 
 void swarm_initialization()
 {
@@ -328,12 +320,6 @@ void swarm_initialization()
 	mchip.vpx=0.0;
 	mchip.vpy=0.0;
 
-	for(t=0;t<delayX;t++){
-		mchip.mempx[t]=0;
-		mchip.mempy[t]=0;
-	}
-	mchip.mempt=0;
-
 	mchip.vx = 1.0;
 	mchip.vy = 1.0;
 	mchip.hd = PI/4.0;
@@ -341,6 +327,7 @@ void swarm_initialization()
 	for(t=0;t<NUM_NEIGHBORS;t++){
 		mchip.neix[t]=0;
 		mchip.neiy[t]=0;
+		mchip.open[t]=0;//###########################################################################################
 	}
 }
 
@@ -349,7 +336,15 @@ void swarm_initialization()
  */
 void swarm_communication()
 {
-
+	/*
+	Here I assume:
+		Send: the value of 'mchip.vpx' and 'mchip.vpy' to the neighbors
+		Receive and store:
+			(mchip.neix[0], mchip.neiy[0]) <- bottom Chip's (.vpx, .vpy)
+			(mchip.neix[1], mchip.neiy[1]) <- left Chip's (.vpx, .vpy)
+			(mchip.neix[2], mchip.neiy[2]) <- right Chip's (.vpx, .vpy)
+			(mchip.neix[3], mchip.neiy[3]) <- top Chip's (.vpx, .vpy)
+	*/
 	mdata.x = mchip.vpx;
 	mdata.y = mchip.vpy;
 
@@ -386,6 +381,7 @@ void swarm_calculation()
 	float dvx, dvy, lx, ly, vabs, ds, fx, fy;
 	// dir new direction
 	float dir = mchip.hd;
+	int i;
 	// cvx, cvy new velocity (?)
 	float cvx = mchip.vx;
 	float cvy = mchip.vy;
@@ -398,10 +394,14 @@ void swarm_calculation()
 	//interaction force with 4 neighbors
 	//It contains the process for boundaries.
 	forcex=0; forcey=0;
-	if(i!=0)  			swarm_interaction(i,j,1);
-	if(i!=SIZEX-1) 		swarm_interaction(i,j,2);
-	if(j!=0)  			swarm_interaction(i,j,3);
-	if(j!=SIZEY-1)		swarm_interaction(i,j,0);
+
+//###########################################################################################
+	for(i=0;i<6;i++){
+		if(mchip.open[i]!=0) swarm_interaction(i);
+	}
+//###########################################################################################
+
+
 	dvx = dvx + forcex;
 	dvy = dvy + forcey;
 
@@ -430,17 +430,11 @@ void swarm_calculation()
 	mchip.px += mchip.vx * dt;
 	mchip.py += mchip.vy * dt;
 
+//###########################################################################################
 	//This memory is for intentional delay effect
-	//mchip.mempx[mchip.mempt] = mchip.px;
-	//mchip.mempy[mchip.mempt] = mchip.py;
-
 	mchip.vpx = mchip.px;
 	mchip.vpy = mchip.py;
-
-	fprintf_P(&usart_stream, PSTR("my_x: %i.%i, my_y: %i.%i\r\n"), prt_flt3(mchip.px), prt_flt3(mchip.py));
-	//mchip.mempt++;
-	//if(mchip.mempt == delayX)	mchip.mempt = 0;
-
+//###########################################################################################
 }
 
 //==============================================
@@ -448,27 +442,26 @@ void swarm_calculation()
  * i, j current position
  * nei neighbor index
  */
-void swarm_interaction(int i, int j, int nei)
+
+void swarm_interaction(int nei)
 {
-	// dirx, diry direction (?)
-	// disx, disy ?
-	// dis1
-	// dis2
-	// alph
-	// force
 	float dirx, diry, disx, disy, dis1, dis2, alph, force;
-	int di,dj;
+	float di,dj;
 
 	dirx = cos(mchip.hd);
 	diry = sin(mchip.hd);
 
+//###########################################################################################
 	switch(nei){
-		case 0: di=0; dj=+1; break;
-		case 1: di=-1; dj=0; break;
-		case 2: di=+1; dj=0; break;
-		case 3: di=0; dj=-1; break;
+		case 0: di= 0.866; dj= 0.500; break;
+		case 1: di=-0.866; dj= 0.500; break;
+		case 2: di=-1.000; dj= 0.000; break;
+		case 3: di=-0.866; dj=-0.500; break;
+		case 4: di= 1.000; dj= 0.000; break;
+		case 5: di= 0.866; dj=-0.500; break;
 	}
-	
+//###########################################################################################	
+
 	disx = mchip.neix[nei] + ld * di - mchip.px;
 	disy = mchip.neiy[nei] + ld * dj - mchip.py;
 
@@ -483,7 +476,7 @@ void swarm_interaction(int i, int j, int nei)
 
 void servo_motor_control()
 {
-	float servo_pos_flt;
+	float servo_pos_flt, speed=8.0;
 	
 	// Angle of axis Aa is calculated by
 	// Aa = 2.0 * cos(mchip.hd)
@@ -494,9 +487,12 @@ void servo_motor_control()
 	// mchip.hd (range: 0 - 2*PI)
 
 	//servo_pos_flt = (mchip.hd-PI)*RADtoDEG;
-	
-	servo_pos_flt = 90*cos(mchip.hd);		// x = r*cos(theta)
-	
+
+//###########################################################################################
+	servo_pos_flt = 90*cos(mchip.hd*speed);		// Servo's speed can be controlled by "speed"
+//###########################################################################################
+
+
 	if(print_servo_info)
 		fprintf_P(&usart_stream, PSTR("hd: %i.%i, deg: %i.%i\r\n"), prt_flt3(mchip.hd), prt_flt3(servo_pos_flt));
 		//fprintf_P(&usart_stream, PSTR("hd: %f, deg: %f\r\n"), mchip.hd, servo_pos_flt);
@@ -515,8 +511,9 @@ int main(void)
         uint32_t j = 0;
         
 		char input_char, first_char;
+		int i;
 		
-        //_delay_ms(50);
+        _delay_ms(50);
         
         init();
         
@@ -525,6 +522,18 @@ int main(void)
         LED_PORT.OUT = LED_USR_0_PIN_bm;
         
         fprintf_P(&usart_stream, PSTR("avr-xgrid build %ld\r\n"), (unsigned long) &__BUILD_NUMBER);
+        
+		/*
+		char str[] = "boot up";
+		Xgrid::Packet pkt;
+		pkt.type = 0;
+		pkt.flags = 0;
+		pkt.radius = 1;
+		pkt.data = (uint8_t *)str;
+		pkt.data_len = 4;
+                        
+		xgrid.send_packet(&pkt);
+		*/
 		
 		// KEN'S CODE 
 		
@@ -541,58 +550,78 @@ int main(void)
 		
         while (1)
         {
-		j = jiffies + 20;	// from here, you have 20 ms to reach the bottom of this loop
+                j = jiffies + 20;	// from here, you have 20 ms to reach the bottom of this loop
 				
-		if (usart.available())
-		{
-			input_char = usart.get();
-		}	
+				if (usart.available())
+				{
+					input_char = usart.get();
+				}	
 							
-		// main loop
-            if (input_char == 0x1b) xboot_reset();
+				// main loop
+                //if (input_char == 0x1b)
+                //        xboot_reset();
 				
-		else if(input_char != 0x00){
-				fprintf_P(&usart_stream, PSTR("CPU: %c\r\n"), input_char);
+				if(input_char != 0x00)
+				{
+					fprintf_P(&usart_stream, PSTR("CPU: %c\r\n"), input_char);
 					
-				if (input_char == 'a'){
-					char str[] = "A";
-                        	Xgrid::Packet pkt;		// Packet is defined on line 72 of xgrid.h
-                        	pkt.type = 0;
-                        	pkt.flags = 0;
-                        	pkt.radius = 1;
-                        	pkt.data = (uint8_t *)str;
-                        	pkt.data_len = 4;
-                        
-                        	xgrid.send_packet(&pkt);
-				}
-				else if(input_char == 's'){
-					if(print_servo_info)
-						print_servo_info = false;
-					else
-						print_servo_info = true;
-				}
+					if (input_char == 'a')
+					{
+						char str[] = "A";
+                        Xgrid::Packet pkt;		// Packet is defined on line 72 of xgrid.h
+                        pkt.type = 0;
+                        pkt.flags = 0;
+                        pkt.radius = 1;
+                        pkt.data = (uint8_t *)str;
+                        pkt.data_len = 4;
+                        xgrid.send_packet(&pkt);
+					}
 					
-				else if(input_char == 'v'){
-					fprintf_P(&usart_stream, PSTR("avr-xgrid build %ld\r\n"), (unsigned long) &__BUILD_NUMBER);
-				}
+					else if(input_char == 's')
+					{
+						if(print_servo_info)
+							print_servo_info = false;
+						else
+							print_servo_info = true;
+					}
 					
-				else if(input_char == 'y'){
-					LED_PORT.OUTTGL = LED_USR_1_PIN_bm;		// toggle yellow LED
-				}
+					else if(input_char == 'v')
+					{
+						fprintf_P(&usart_stream, PSTR("avr-xgrid build %ld\r\n"), (unsigned long) &__BUILD_NUMBER);
+					}
 					
-				input_char = 0x00;	// clear the most recent computer input
-		}
+					else if(input_char == 'y')
+					{
+						LED_PORT.OUTTGL = LED_USR_1_PIN_bm;		// toggle yellow LED
+						mchip.hd=PI;
+						for(i=0;i<6;i++) fprintf_P(&usart_stream, PSTR("(%i.%i) "), prt_flt3(mchip.neix[i]));
+						fprintf_P(&usart_stream, PSTR("\r\n"));
+					}
+					
+					input_char = 0x00;	// clear the most recent computer input
+				}
 				
+				// KEN'S CODE:
 				
-		if(jiffies > j)	// if TRUE, then we took too long to get here, halt program
-		{
-			cli();	//disable_interrupts
-			LED_PORT.OUTSET &= ~LED_USR_2_PIN_bm;	// turn green light off and keep it off
-			LED_PORT.OUTSET = LED_USR_0_PIN_bm;		// turn red light on and keep it on
-			LED_PORT.OUTSET = LED_USR_1_PIN_bm;		// turn yellow light on and keep it on
-			while(1==1)	{};
-		}					
+				//swarm_communication();	// moved to ISR(TCC0_OVF_vect) where it is executed every 100 ms
+				//swarm_calculation();		// moved to ISR(TCC0_OVF_vect) where it is executed every 100 ms
+				//servo_motor_control();
 				
-            while (j > jiffies) { };
+		
+                // END KEN'S CODE
+				
+				if(jiffies > j)	// if TRUE, then we took too long to get here, halt program
+				{
+					cli();	//disable_interrupts
+					LED_PORT.OUTSET &= ~LED_USR_2_PIN_bm;	// turn green light off and keep it off
+					LED_PORT.OUTSET = LED_USR_0_PIN_bm;		// turn red light on and keep it on
+					LED_PORT.OUTSET = LED_USR_1_PIN_bm;		// turn yellow light on and keep it on
+					while(1==1)
+					{};
+				}					
+				
+                while (j > jiffies) { };
         }  
 }
+
+
